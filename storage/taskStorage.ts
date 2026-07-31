@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Task } from "../types/task";
 
+// Persist tasks to device storage
 const TASKS_STORAGE_KEY = "tasks";
 
 export async function loadTasks(): Promise<Task[]> {

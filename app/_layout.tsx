@@ -3,6 +3,7 @@ import "../global.css";
 import { Stack } from "expo-router";
 import { TaskProvider } from "../context/TaskContext";
 
+// Root layout - wraps app with task context provider
 export default function RootLayout() {
   return (
     <TaskProvider>

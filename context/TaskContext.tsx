@@ -9,6 +9,7 @@ import {
 import { loadTasks, saveTasks } from "../storage/taskStorage";
 import { Task } from "../types/task";
 
+// Context for global task state management
 type TaskContextType = {
   tasks: Task[];
   isLoading: boolean;

@@ -10,6 +10,7 @@ import {
 
 import { useTasks } from "../context/TaskContext";
 
+// Home screen - displays tasks with filter and search
 type FilterStatus = "all" | "todo" | "doing" | "done";
 
 export default function HomeScreen() {
