@@ -1,8 +1,10 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -15,12 +17,23 @@ export default function NewTaskScreen() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const [status, setStatus] = useState<
     "todo" | "doing" | "done"
   >("todo");
 
   const { addTask } = useTasks();
   const router = useRouter();
+
+  // Converts a Date into YYYY-MM-DD format.
+  function formatDate(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
 
   function handleCreateTask() {
     if (!title.trim()) {
@@ -36,7 +49,7 @@ export default function NewTaskScreen() {
       title: title.trim(),
       category: category.trim(),
       description: description.trim(),
-      dueDate: dueDate.trim(),
+      dueDate,
       status,
     });
 
@@ -44,7 +57,10 @@ export default function NewTaskScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-100 p-6">
+    <ScrollView
+      className="flex-1 bg-slate-100"
+      contentContainerClassName="p-6"
+    >
       <Text className="mb-4 text-2xl font-bold">
         Create Task
       </Text>
@@ -88,12 +104,36 @@ export default function NewTaskScreen() {
         Due Date
       </Text>
 
-      <TextInput
-        value={dueDate}
-        onChangeText={setDueDate}
-        placeholder="YYYY-MM-DD"
+      <Pressable
+        onPress={() => setShowDatePicker(true)}
         className="rounded-lg border border-slate-300 bg-white px-4 py-3"
-      />
+      >
+        <Text
+          className={
+            dueDate ? "text-slate-900" : "text-slate-500"
+          }
+        >
+          {dueDate || "Select a due date"}
+        </Text>
+      </Pressable>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={
+            dueDate
+              ? new Date(`${dueDate}T00:00:00`)
+              : new Date()
+          }
+          mode="date"
+          onChange={(_, selectedDate) => {
+            setShowDatePicker(false);
+
+            if (selectedDate) {
+              setDueDate(formatDate(selectedDate));
+            }
+          }}
+        />
+      )}
 
       <Text className="mb-2 mt-4 font-semibold">
         Status
@@ -127,12 +167,12 @@ export default function NewTaskScreen() {
 
       <Pressable
         onPress={handleCreateTask}
-        className="mt-6 rounded-lg bg-blue-600 px-4 py-3"
+        className="mb-8 mt-6 rounded-lg bg-blue-600 px-4 py-3"
       >
         <Text className="text-center font-semibold text-white">
           Save Task
         </Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
