@@ -1,6 +1,12 @@
-import { Stack } from "expo-router";
 import "../global.css";
 
+import { Stack } from "expo-router";
+import { TaskProvider } from "../context/TaskContext";
+
 export default function RootLayout() {
-  return <Stack />;
+  return (
+    <TaskProvider>
+      <Stack />
+    </TaskProvider>
+  );
 }
