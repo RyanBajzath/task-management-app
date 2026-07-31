@@ -1,16 +1,34 @@
 import { Link, useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Pressable,
   ScrollView,
   Text,
+  TextInput,
   View,
 } from "react-native";
 
 import { useTasks } from "../context/TaskContext";
 
+type FilterStatus = "all" | "todo" | "doing" | "done";
+
 export default function HomeScreen() {
   const { tasks, isLoading } = useTasks();
   const router = useRouter();
+
+  const [filter, setFilter] = useState<FilterStatus>("all");
+  const [search, setSearch] = useState("");
+
+  const filteredTasks = tasks.filter((task) => {
+    const matchesStatus =
+      filter === "all" || task.status === filter;
+
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(search.trim().toLowerCase());
+
+    return matchesStatus && matchesSearch;
+  });
 
   if (isLoading) {
     return (
@@ -37,12 +55,49 @@ export default function HomeScreen() {
         Create Task
       </Link>
 
-      {tasks.length === 0 ? (
+      <TextInput
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Search tasks by title"
+        className="mb-6 rounded-lg border border-slate-300 bg-white px-4 py-3"
+      />
+
+      <Text className="mb-2 font-semibold">
+        Filter by status
+      </Text>
+
+      <View className="mb-6 flex-row gap-2">
+        {(["all", "todo", "doing", "done"] as const).map(
+          (item) => (
+            <Pressable
+              key={item}
+              onPress={() => setFilter(item)}
+              className={`rounded-lg px-3 py-2 ${
+                filter === item
+                  ? "bg-blue-600"
+                  : "bg-white"
+              }`}
+            >
+              <Text
+                className={
+                  filter === item
+                    ? "font-semibold text-white"
+                    : "font-semibold text-slate-700"
+                }
+              >
+                {item}
+              </Text>
+            </Pressable>
+          )
+        )}
+      </View>
+
+      {filteredTasks.length === 0 ? (
         <Text className="text-center text-slate-500">
-          No tasks yet.
+          No tasks found.
         </Text>
       ) : (
-        tasks.map((task) => (
+        filteredTasks.map((task) => (
           <Pressable
             key={task.id}
             onPress={() => router.push(`/tasks/${task.id}`)}

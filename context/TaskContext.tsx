@@ -1,6 +1,6 @@
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
@@ -15,21 +15,27 @@ type TaskContextType = {
   addTask: (task: Task) => void;
   updateTask: (updatedTask: Task) => void;
   deleteTask: (id: string) => void;
+  advanceTaskStatus: (id: string) => void;
 };
 
-const TaskContext = createContext<TaskContextType | undefined>(undefined);
+const TaskContext = createContext<TaskContextType | undefined>(
+  undefined
+);
 
 type TaskProviderProps = {
   children: ReactNode;
 };
 
-export function TaskProvider({ children }: TaskProviderProps) {
+export function TaskProvider({
+  children,
+}: TaskProviderProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function getStoredTasks() {
       const storedTasks = await loadTasks();
+
       setTasks(storedTasks);
       setIsLoading(false);
     }
@@ -44,13 +50,18 @@ export function TaskProvider({ children }: TaskProviderProps) {
   }, [tasks, isLoading]);
 
   function addTask(task: Task) {
-    setTasks((currentTasks) => [...currentTasks, task]);
+    setTasks((currentTasks) => [
+      ...currentTasks,
+      task,
+    ]);
   }
 
   function updateTask(updatedTask: Task) {
     setTasks((currentTasks) =>
       currentTasks.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task
+        task.id === updatedTask.id
+          ? updatedTask
+          : task
       )
     );
   }
@@ -58,6 +69,32 @@ export function TaskProvider({ children }: TaskProviderProps) {
   function deleteTask(id: string) {
     setTasks((currentTasks) =>
       currentTasks.filter((task) => task.id !== id)
+    );
+  }
+
+  function advanceTaskStatus(id: string) {
+    setTasks((currentTasks) =>
+      currentTasks.map((task) => {
+        if (task.id !== id) {
+          return task;
+        }
+
+        if (task.status === "todo") {
+          return {
+            ...task,
+            status: "doing",
+          };
+        }
+
+        if (task.status === "doing") {
+          return {
+            ...task,
+            status: "done",
+          };
+        }
+
+        return task;
+      })
     );
   }
 
@@ -69,6 +106,7 @@ export function TaskProvider({ children }: TaskProviderProps) {
         addTask,
         updateTask,
         deleteTask,
+        advanceTaskStatus,
       }}
     >
       {children}
@@ -80,7 +118,9 @@ export function useTasks() {
   const context = useContext(TaskContext);
 
   if (!context) {
-    throw new Error("useTasks must be used inside a TaskProvider");
+    throw new Error(
+      "useTasks must be used inside a TaskProvider"
+    );
   }
 
   return context;

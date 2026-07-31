@@ -5,7 +5,12 @@ import { useTasks } from "../../context/TaskContext";
 
 export default function TaskDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { tasks, deleteTask } = useTasks();
+  const {
+    tasks,
+    deleteTask,
+    advanceTaskStatus,
+  } = useTasks();
+
   const router = useRouter();
 
   const task = tasks.find((item) => item.id === id);
@@ -41,7 +46,9 @@ export default function TaskDetailScreen() {
 
   return (
     <View className="flex-1 bg-slate-100 p-6">
-      <Text className="text-3xl font-bold">{task.title}</Text>
+      <Text className="text-3xl font-bold">
+        {task.title}
+      </Text>
 
       <Text className="mt-4 text-base">
         Category: {task.category || "None"}
@@ -55,15 +62,33 @@ export default function TaskDetailScreen() {
         Due date: {task.dueDate || "No due date"}
       </Text>
 
-      <Text className="mt-6 font-semibold">Description</Text>
+      <Text className="mt-6 font-semibold">
+        Description
+      </Text>
 
       <Text className="mt-2 text-slate-600">
         {task.description || "No description"}
       </Text>
 
+      {task.status !== "done" && (
+        <Pressable
+          onPress={() => advanceTaskStatus(task.id)}
+          className="mt-8 rounded-lg bg-emerald-600 px-4 py-3"
+        >
+          <Text className="text-center font-semibold text-white">
+            Move to{" "}
+            {task.status === "todo" ? "Doing" : "Done"}
+          </Text>
+        </Pressable>
+      )}
+
       <Pressable
-        onPress={() => router.push(`/tasks/${task.id}/edit`)}
-        className="mt-8 rounded-lg bg-blue-600 px-4 py-3"
+        onPress={() =>
+          router.push(`/tasks/${task.id}/edit`)
+        }
+        className={`rounded-lg bg-blue-600 px-4 py-3 ${
+          task.status === "done" ? "mt-8" : "mt-3"
+        }`}
       >
         <Text className="text-center font-semibold text-white">
           Edit Task
