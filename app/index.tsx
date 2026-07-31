@@ -1,10 +1,16 @@
-import { Link } from "expo-router";
-import { ScrollView, Text, View } from "react-native";
+import { Link, useRouter } from "expo-router";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import { useTasks } from "../context/TaskContext";
 
 export default function HomeScreen() {
   const { tasks, isLoading } = useTasks();
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -37,8 +43,9 @@ export default function HomeScreen() {
         </Text>
       ) : (
         tasks.map((task) => (
-          <View
+          <Pressable
             key={task.id}
+            onPress={() => router.push(`/tasks/${task.id}`)}
             className="mb-4 rounded-lg bg-white p-4"
           >
             <Text className="text-xl font-bold">
@@ -56,7 +63,7 @@ export default function HomeScreen() {
             <Text className="mt-1 text-slate-600">
               Due: {task.dueDate || "No due date"}
             </Text>
-          </View>
+          </Pressable>
         ))
       )}
     </ScrollView>
