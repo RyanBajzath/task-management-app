@@ -62,8 +62,17 @@ export default function TaskDetailScreen() {
       </Text>
 
       <Pressable
+        onPress={() => router.push(`/tasks/${task.id}/edit`)}
+        className="mt-8 rounded-lg bg-blue-600 px-4 py-3"
+      >
+        <Text className="text-center font-semibold text-white">
+          Edit Task
+        </Text>
+      </Pressable>
+
+      <Pressable
         onPress={handleDeleteTask}
-        className="mt-8 rounded-lg bg-red-600 px-4 py-3"
+        className="mt-3 rounded-lg bg-red-600 px-4 py-3"
       >
         <Text className="text-center font-semibold text-white">
           Delete Task
